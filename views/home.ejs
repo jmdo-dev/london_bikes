@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>TFL Cycle Availability</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./main.css">
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <!-- MAIN RENDER SCRIPT -->
+    <script>
+  		async function initMap() {
+  			let map = new google.maps.Map(document.getElementById('map'), {
+  			center: {lat: 51.5080, lng: -0.1281},
+  			zoom: 15,
+  			styles: styleMap()
+  			});
+      
+      // TODO: Why are these ejs tags showing as prob in terminal? //
+      let data = <%- JSON.stringify(bikepoints, null, 4) %>
+      
+      data.forEach(function(dock){
+        let latlng = new google.maps.LatLng(parseFloat(dock.location.lat),parseFloat(dock.location.lon))
+        let marker = new google.maps.Marker({
+          position: latlng,
+          map: map,
+          title: dock.name,
+          icon: (dock.bikes <= 3) ?
+            {
+                url: './cycling-red.png',
+            } :
+            {
+              url: './cycling-green.png',
+          },
+        })
+        
+        const infowindow = new google.maps.InfoWindow();
+        var contentString = `
+        <h3>${dock.name}</h3>
+        <h4>Available Bikes: ${dock.bikes}</h4>
+        <h4>Free Spaces: ${dock.spaces}</h4>
+        `
+        infowindow.setContent(contentString)
+      
+        marker.addListener('click', function() {
+          infowindow.open(map, marker);
+        });
+      })
+		}
+    </script>	
+   
+    <!-- GOOGLE API CALL SCRIPT -->
+    <script 
+      src= https://maps.googleapis.com/maps/api/js?key=<%- key %>&callback=initMap
+      async defer> 
+    </script>
+    
+    <!-- MAP STYLING SCRIPT-->
+    <script type="text/javascript" src="./styleMap.js"></script>
+  </body>
+</html>
+
